@@ -76,15 +76,62 @@ A function `__inject__/2` is generated in the above module `Foo`. When it is
 called, the callbacks are triggered in the order defined by your pointcuts.
 
 Throughout the execution of the pointcut callbacks, an accumulator is passed
-and updated through each callback. The execution process may be halted by a
-return value of particular types of callbacks.
+and updated after running each callback. The execution process may be halted
+by a return value of a callback.
 
 If the execution is not halted by any callback, the final accumulator value is
 returned by the `__inject__/2` function. Otherwise, the return value of the
 callback that terminates the entire execution process is returned.
 
-Each pointcut kind has a different impact on the execution process and the
-accumulator:
+In the above example, the value of the accumulator is returned if the
+`check_validity` is passed:
+
+    iex> params = %{a: 1, b: 2}
+    iex> initial_acc = %{}
+    iex> Foo.__inject__(params, initial_acc)
+    %{result: 0.5}
+
+
+The halted error is returned if the execution is aborted:
+
+    iex> params = %{a: 1, b: 0}
+    iex> initial_acc = %{}
+    iex> Foo.__inject__(params, initial_acc)
+    {:error, :divide_by_zero}
+
+`check :validity` and `set :compute` are pointcut definitions,
+`check_validity/3` and `set_compute/3` are the pointcut callback functions
+required by these definitions.
+
+Additional arguments can be set:
+
+```elixir
+check :validity, some_option: true
+set :compute, {:a, :b}
+```
+
+All types of pointcut callbacks have the same function signature. Each callback
+function following the naming convention in the example, using an underscore
+to connect the pointcut type and the following atom as the callback function
+name.
+
+Each callback has three arguments and each argument can be of any Elixir term.
+
+The first argument of the callback function is passed from the first argument
+of the caller `__inject__/2`. The argument remains unchanged in each callback
+during the execution process.
+
+The second argument of the callback function is passed from its pointcut
+definition, for example, `set :compute, :my_arg` passes `:my_arg` as the
+second argument of its callback function `set_compute/3`.
+
+The third argument is the accumulator. It is initialized as the second
+argument of the caller `__inject__/2`. The value of accumulator is updated or
+remains the same after each callback execution, depending on the types and
+the return values of the callback functions.
+
+Each kind of pointcut has different impacts on the execution process and the
+accumulator.
 
 * `check`
   - the execution of the generated function is halted if its callback
@@ -95,30 +142,11 @@ return value matches the pattern `{:error, _}`.
   - sets the accumulator to its callback return value.
   - does not halt the execution process.
 * `preprocess`
-  - allows to change the accumulator or halt the execution process.
+  - allows to change the value of the accumulator or halt the execution process.
   - the execution of the generated function is halted if its callback return
   value matches the pattern `{:error, _}`.
   - the accumulator is updated to the wrapped `acc` if its callback return
   value matches the pattern `{:ok, acc}`.
-
-In the above example, the accumulator is returned if the `check_validity` is
-passed:
-
-```elixir
-iex> params = %{a: 1, b: 2}
-iex> initial_acc = %{}
-iex> Foo.__inject__(params, initial_acc)
-%{result: 0.5}
-```
-
-The halted error is returned if the execution is aborted:
-
-```elixir
-iex> params = %{a: 1, b: 0}
-iex> initial_acc = %{}
-iex> Foo.__inject__(params, initial_acc)
-{:error, :divide_by_zero}
-```
 
 ### A more in-depth example
 
