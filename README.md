@@ -86,18 +86,21 @@ callback that terminates the entire execution process is returned.
 In the above example, the value of the accumulator is returned if the
 `check_validity` is passed:
 
-    iex> params = %{a: 1, b: 2}
-    iex> initial_acc = %{}
-    iex> Foo.__inject__(params, initial_acc)
-    %{result: 0.5}
-
+```elixir
+iex> params = %{a: 1, b: 2}
+iex> initial_acc = %{}
+iex> Foo.__inject__(params, initial_acc)
+%{result: 0.5}
+```
 
 The halted error is returned if the execution is aborted:
 
-    iex> params = %{a: 1, b: 0}
-    iex> initial_acc = %{}
-    iex> Foo.__inject__(params, initial_acc)
-    {:error, :divide_by_zero}
+```elixir
+iex> params = %{a: 1, b: 0}
+iex> initial_acc = %{}
+iex> Foo.__inject__(params, initial_acc)
+{:error, :divide_by_zero}
+```
 
 `check :validity` and `set :compute` are pointcut definitions,
 `check_validity/3` and `set_compute/3` are the pointcut callback functions
