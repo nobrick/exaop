@@ -6,9 +6,18 @@ defmodule Exaop.MixProject do
       app: :exaop,
       version: "0.1.0",
       elixir: "~> 1.10",
+      description: description(),
       start_permanent: Mix.env() == :prod,
       package: package(),
-      deps: deps()
+      deps: deps(),
+      main: "Exaop",
+      name: "Exaop",
+      source_url: source_url(),
+      docs: [
+        extras: [
+          "README.md"
+        ]
+      ]
     ]
   end
 
@@ -16,6 +25,10 @@ defmodule Exaop.MixProject do
     [
       extra_applications: [:logger]
     ]
+  end
+
+  defp description() do
+    "A minimal library for aspect-oriented programming."
   end
 
   defp deps do
@@ -31,7 +44,11 @@ defmodule Exaop.MixProject do
       name: :exaop,
       maintainers: ["Ming Qu"],
       licenses: ["MIT"],
-      links: %{}
+      links: %{"GitHub" => source_url()}
     ]
+  end
+
+  defp source_url do
+    "https://github.com/nobrick/exaop"
   end
 end
