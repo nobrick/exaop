@@ -35,7 +35,8 @@ defmodule Exaop do
       end
 
   A function `__inject__/2` is generated in the above module `Foo`. When it is
-  called, the callbacks are triggered in the order defined by your pointcuts.
+  called, the callbacks are triggered in the order defined by your pointcut
+  definitions.
 
   Throughout the execution of the pointcut callbacks, an accumulator is passed
   and updated after running each callback. The execution process may be halted

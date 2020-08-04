@@ -73,7 +73,8 @@ end
 ```
 
 A function `__inject__/2` is generated in the above module `Foo`. When it is
-called, the callbacks are triggered in the order defined by your pointcuts.
+called, the callbacks are triggered in the order defined by your pointcut
+definitions.
 
 Throughout the execution of the pointcut callbacks, an accumulator is passed
 and updated after running each callback. The execution process may be halted
@@ -102,7 +103,14 @@ iex> Foo.__inject__(params, initial_acc)
 {:error, :divide_by_zero}
 ```
 
-`check :validity` and `set :compute` are pointcut definitions,
+### Pointcut definitions
+
+```elixir
+check :validity
+set :compute
+```
+
+We've already seen the pointcut definitions in the example before.
 `check_validity/3` and `set_compute/3` are the pointcut callback functions
 required by these definitions.
 
@@ -112,6 +120,10 @@ Additional arguments can be set:
 check :validity, some_option: true
 set :compute, {:a, :b}
 ```
+
+### Pointcut callbacks
+
+#### Naming and arguments
 
 All types of pointcut callbacks have the same function signature. Each callback
 function following the naming convention in the example, using an underscore
@@ -133,29 +145,41 @@ argument of the caller `__inject__/2`. The value of accumulator is updated or
 remains the same after each callback execution, depending on the types and
 the return values of the callback functions.
 
+#### Types and behaviours
+
 Each kind of pointcut has different impacts on the execution process and the
 accumulator.
 
-* `check`
-  - the execution of the generated function is halted if its callback
-return value matches the pattern `{:error, _}`.
-  - the execution continues if its callback returns `:ok`.
+- `check`
   - does not change the value of the accumulator.
-* `set`
-  - sets the accumulator to its callback return value.
+  - the execution of the generated function is halted if its callback
+    return value matches the pattern `{:error, _}`.
+  - the execution continues if its callback returns `:ok`.
+- `set`
   - does not halt the execution process.
-* `preprocess`
+  - sets the accumulator to its callback return value.
+- `preprocess`
   - allows to change the value of the accumulator or halt the execution process.
   - the execution of the generated function is halted if its callback return
-  value matches the pattern `{:error, _}`.
+    value matches the pattern `{:error, _}`.
   - the accumulator is updated to the wrapped `acc` if its callback return
-  value matches the pattern `{:ok, acc}`.
+    value matches the pattern `{:ok, acc}`.
+
+View documentation of these macros for details.
 
 ### A more in-depth example
 
-Exaop also supports passing arguments from pointcut definitions to its
-callbacks. Moreover, callbacks could also be defined in modules other
-than its pointcut definitions.
+Exaop is ready for production and makes complex application workflows simple
+and self-documenting. In practice, we combine it with some custom simple macros
+as a method to separate cross-cutting concerns and decouple business logic.
+Note that we do not recommend overusing it, it is only needed when the workflow
+gets complicated, and the pointcuts should be strictly restricted to the domain
+of cross-cutting logic, not the business logic body itself.
+
+Here's a more complex example, a wallet balance transfer. The configuration
+loading, context setting and transfer validations are separated, but the main
+transfer logic remains untouched. The example also introduces an external
+callback, which is defined in a module other than its pointcut definition.
 
 ```elixir
 defmodule Wallet do
@@ -278,7 +302,7 @@ defmodule Wallet.AML do
 
   @behaviour Exaop.Checker
 
-  @aml_blacklist ["Jack"]
+  @aml_blacklist ~w(Trump)
 
   @impl true
   def check(%{from: from, to: to}, _args, _acc) do
@@ -299,4 +323,3 @@ end
 ## License
 
 [The MIT License](https://github.com/nobrick/exaop/blob/master/LICENSE)
-
