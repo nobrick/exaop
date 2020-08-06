@@ -5,7 +5,7 @@ defmodule Exaop.MixProject do
     [
       app: :exaop,
       version: "0.1.0",
-      elixir: "~> 1.10",
+      elixir: "~> 1.7",
       description: description(),
       start_permanent: Mix.env() == :prod,
       package: package(),
