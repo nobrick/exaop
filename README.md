@@ -1,5 +1,7 @@
 # Exaop
 
+[![Build Status](https://github.com/nobrick/exaop/workflows/CI/badge.svg)](https://github.com/nobrick/exaop/actions?query=workflow%3ACI)
+
 A minimal elixir library for aspect-oriented programming.
 
 ## Installation
